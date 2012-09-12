@@ -27,7 +27,7 @@ public:
 	ofxFaceTracker tracker;
 	ExpressionClassifier classifier;
 	
-	bool addExpression, addSample, saveData, loadData, debug, screens;
+	bool addExpression, addSample, saveData, loadData, debug, screens, fs;
     int screenW, screenH, camW, camH;
     float volume, pitch;
     string performer;

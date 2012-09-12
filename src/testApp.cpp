@@ -5,8 +5,10 @@ void testApp::setup() {
     //PERFORMER (M or F)
     //N: Neutral
     //pitch of sounds effects is offset
+    
     performer = "F";
     setSex(performer);
+    fs = false;
     
     //is this version for the ITP screens installation?
     screens = false;
@@ -200,8 +202,8 @@ void testApp::draw() {
             smile.play();
 
             //midi output
-            //midiOut.sendProgramChange(1,50);
-            //midiOut.sendNoteOn(1, note, 100);
+            midiOut.sendProgramChange(1,50);
+            midiOut.sendNoteOn(1, note, 100);
 
             //smile.setSpeed( 0.1f + ((float)(ofGetHeight() - y) / (float)ofGetHeight())*10);
 
@@ -261,34 +263,37 @@ void testApp::keyPressed(int key) {
 		tracker.reset();
 		classifier.reset();
 	}
-	if(key == 'e') {
+	else if(key == 'e') {
 		addExpression = true;
 	}
-	if(key == 'a') {
+	else if(key == 'a') {
 		addSample = true;
 	}
-	if(key == 's') {
+	else if(key == 's') {
 		saveData = true;
 	}
-	if(key == 'l') {
+	else if(key == 'l') {
 		loadData = true;
 	}
 
-    if(key == 'd') {
+    else if(key == 'd') {
 		debug = !debug;
 	}
     
-    if(key == 'c') {
+    else if(key == 'c') {
         //camera 
         cam.videoSettings();
 
 	}
-    if(key == 'b') {
+    else if(key == 'b') {
         //play the heartbeat 
         heart.play();        
 	}
     if(key == 'f') {
-        setSex("F");
+     
+        ofSetFullscreen(fs);
+        fs = !fs;
+        //   setSex("F");
 	}
     if(key == 'm') {
         setSex("M");
