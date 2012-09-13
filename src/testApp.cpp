@@ -147,7 +147,13 @@ void testApp::update(){
 
 void testApp::draw() {
 	ofSetColor(255);
-    	cam.draw(0,0);
+   // cam.draw(0,0);
+    //convert cam image to greyscale
+    ofImage camImage;
+    camImage.setFromPixels(cam.getPixels(), cam.width, cam.height, OF_IMAGE_COLOR);
+    camImage.setImageType(OF_IMAGE_GRAYSCALE);
+    camImage.draw(0,0);
+    
     
 	int w = 100, h = 12;
 	ofPushStyle();
@@ -186,6 +192,7 @@ void testApp::draw() {
         
         ofDrawBitmapString(ofToString(tracker.getGesture(ofxFaceTracker::JAW_OPENNESS)), 100, 20);
         ofDrawBitmapString("note: "+ofToString(note), 50, 30);
+        ofDrawBitmapString("scale: "+ofToString(tracker.getScale()), 50, 40);
 
 
     }
