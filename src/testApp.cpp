@@ -203,11 +203,12 @@ void testApp::draw() {
     if(primary){
         String currentExpression = classifier.getDescription(primary);
        // ofDrawBitmapString("currentExpression: "+currentExpression, 100, 18);
+        volume = ofMap(tracker.getScale(),3,13,0,1);
         if(currentExpression == "happy"){
             showFace();
             if(version == 1){
                 //smile!
-                smile.setVolume(classifier.getProbability(primary)*volume*tracker.size());
+                smile.setVolume(classifier.getProbability(primary)*volume);
                 float speed = ofMap(tracker.getGesture(ofxFaceTracker::JAW_OPENNESS),20,30,.1,2);
                 smile.setSpeed(speed*pitch);
                 smile.play();
