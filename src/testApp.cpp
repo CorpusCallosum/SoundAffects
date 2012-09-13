@@ -6,9 +6,13 @@ void testApp::setup() {
     //N: Neutral
     //pitch of sounds effects is offset
     
-    performer = "F";
+    performer = "M";
     setSex(performer);
     fs = false;
+    
+    //CONTROL for version or style of the audio effects triggered
+   // version = 1; //Using expression detection and playing audio samples
+    version = 2; //Outputing midi to synthesizer
     
     //is this version for the ITP screens installation?
     screens = false;
@@ -97,7 +101,7 @@ void testApp::setSex(string sex){
         surprise.setPan(pan);
         neutral.setPan(pan);
         //overall effect volume
-        volume = .02;
+        volume = 1;
 
     }
     else{
@@ -181,50 +185,55 @@ void testApp::draw() {
         
         
         ofDrawBitmapString(ofToString(tracker.getGesture(ofxFaceTracker::JAW_OPENNESS)), 100, 20);
+        ofDrawBitmapString("note: "+ofToString(note), 50, 30);
+
+
     }
-    
+    //************************************************************************
+    //*******TRIGGER AUDIO***************************************************************
+    //************************************************************************
     //"primary" is a number id of the expression
     if(primary){
         String currentExpression = classifier.getDescription(primary);
        // ofDrawBitmapString("currentExpression: "+currentExpression, 100, 18);
         if(currentExpression == "happy"){
-           showFace();
-            //smile!
-            smile.setVolume(classifier.getProbability(primary)*volume);
-            float speed = ofMap(tracker.getGesture(ofxFaceTracker::JAW_OPENNESS),20,30,.1,2);
+            showFace();
+            if(version == 1){
+                //smile!
+                smile.setVolume(classifier.getProbability(primary)*volume*tracker.size());
+                float speed = ofMap(tracker.getGesture(ofxFaceTracker::JAW_OPENNESS),20,30,.1,2);
+                smile.setSpeed(speed*pitch);
+                smile.play();
+            }
             
-            smile.setSpeed(speed*pitch);
-            
-            int note = tracker.getGesture(ofxFaceTracker::JAW_OPENNESS);
-            //j/30 = x/1000 | x = (j/30)*1000 
-          //  smile.setSpeed((tracker.getGesture(ofxFaceTracker::JAW_OPENNESS)/30)*20*pitch);
-            
-            smile.play();
-
-            //midi output
-            midiOut.sendProgramChange(1,50);
-            midiOut.sendNoteOn(1, note, 100);
-
-            //smile.setSpeed( 0.1f + ((float)(ofGetHeight() - y) / (float)ofGetHeight())*10);
-
-            //smile.setSpeed( 0.1f + ((float)(ofGetHeight() - y) / (float)ofGetHeight())*10);
-            //smile.setPan(pct);
+            if(version == 2){
+                //turn off previous midi note
+                if(note){
+                    midiOut.sendNoteOff(1, note, 100);
+                }
+                
+                float ja = tracker.getGesture(ofxFaceTracker::JAW_OPENNESS);
+                note = floor(ofMap(ja, 25, 33, 25, 100));
+                
+                //midi output
+                midiOut.sendProgramChange(1,50);
+                midiOut.sendNoteOn(1, note, 100);
+            }
         
         }
         else if(currentExpression == "surprise"){
-           showFace();
-             surprise.setVolume(classifier.getProbability(primary)*1*volume);
-            float speed = ofMap(tracker.getGesture(ofxFaceTracker::JAW_OPENNESS),20,30,.5,1.5);
-            surprise.setSpeed(speed*pitch);
-            //surprise.setSpeed((tracker.getGesture(ofxFaceTracker::JAW_OPENNESS)/30)*pitch);
-          //  if(!surprise.getIsPlaying()){
+            showFace();
+            if(version == 1){
+                surprise.setVolume(classifier.getProbability(primary)*1*volume);
+                float speed = ofMap(tracker.getGesture(ofxFaceTracker::JAW_OPENNESS),20,30,.5,1.5);
+                surprise.setSpeed(speed*pitch);
                 surprise.play();
-           // }
+            }
             
             
 
         }
-        else if(currentExpression == "sad"){
+       /* else if(currentExpression == "sad"){
             showFace();
             sad.setVolume(classifier.getProbability(primary)*volume);
             
@@ -234,22 +243,32 @@ void testApp::draw() {
             
            // midiOut.sendProgramChange(1,1);
            // midiOut.sendNoteOn(1, note, 100);
-        }
+        }*/
         else if(currentExpression == "neutral"){
           //  tracker.draw();
-            neutral.setVolume(classifier.getProbability(primary)/7*volume);
-            neutral.setSpeed((tracker.getGesture(ofxFaceTracker::JAW_OPENNESS)/30)*pitch);
-            neutral.play();
-           
+            if(version == 1){
+                neutral.setVolume(classifier.getProbability(primary)/7*volume);
+                neutral.setSpeed((tracker.getGesture(ofxFaceTracker::JAW_OPENNESS)/30)*pitch);
+                neutral.play();
+            }
         }
 
+    }
+    else{
+        //no face found
+        turnMidiNoteOff();
     }
     
 	ofPopMatrix();
 	ofPopStyle();
 	
-	// blood.draw(0,0);
     ofBackground(0,0,0);//clear stuff
+}
+
+void testApp::turnMidiNoteOff(){
+    if(note){
+        midiOut.sendNoteOff(1, note, 100);
+    }    
 }
 
 void testApp::showFace(){
@@ -289,14 +308,23 @@ void testApp::keyPressed(int key) {
         //play the heartbeat 
         heart.play();        
 	}
-    if(key == 'f') {
+    else if(key == 'f') {
      
         ofSetFullscreen(fs);
         fs = !fs;
         //   setSex("F");
 	}
-    if(key == 'm') {
+    else if(key == 'm') {
         setSex("M");
 	}
+    else if(key == 'v') {
+        //cahnge between versions 1 and 2
+        if(version == 1){
+            version = 2;
+        }
+        else{
+            version = 1;
+        }
+    }
 
 }

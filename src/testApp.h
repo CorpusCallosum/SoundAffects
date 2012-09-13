@@ -18,6 +18,8 @@ public:
 	void update();
 	void draw();
     void showFace();
+    void turnMidiNoteOff();
+
     void setSex(string sex);
 	void keyPressed(int key);
 
@@ -28,8 +30,9 @@ public:
 	ExpressionClassifier classifier;
 	
 	bool addExpression, addSample, saveData, loadData, debug, screens, fs;
-    int screenW, screenH, camW, camH;
+    int screenW, screenH, camW, camH, version, note, midiNoteRange;
     float volume, pitch;
+    
     string performer;
     
     //sound stuff integration
