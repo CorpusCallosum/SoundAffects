@@ -11,8 +11,8 @@ void testApp::setup() {
     fs = false;
     
     //CONTROL for version or style of the audio effects triggered
-   // version = 1; //Using expression detection and playing audio samples
-    version = 2; //Outputing midi to synthesizer
+    version = 1; //Using expression detection and playing audio samples
+    //version = 2; //Outputing midi to synthesizer
     
     //is this version for the ITP screens installation?
     screens = false;
